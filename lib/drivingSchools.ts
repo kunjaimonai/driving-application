@@ -6,12 +6,12 @@ const APPS_SCRIPT_URL =
 export async function fetchDrivingSchools(): Promise<DrivingSchool[]> {
   const res = await fetch(
     `${APPS_SCRIPT_URL}?action=getSchools`,
-    { cache: "no-store" } // always fresh
+    {
+      next: { revalidate: 60 }, // cache 1 min
+    }
   )
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch driving schools")
-  }
+  if (!res.ok) throw new Error("Failed")
 
   return res.json()
 }

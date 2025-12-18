@@ -21,14 +21,30 @@ import { submitApplication } from "@/lib/drivingLicenseService";
 
 type LicenseClass = "M/C" | "LMV" | "M/C,LMV";
 
+const SCHOOL_CACHE_KEY = "driving_schools_cache";
+
 export default function DrivingLicenseForm() {
   const [loading, setLoading] = useState(false);
   const [schools, setSchools] = useState<DrivingSchool[]>([]);
   const [loadingSchools, setLoadingSchools] = useState(true);
 
+  /* =========================
+     LOAD SCHOOLS (CACHED)
+  ========================= */
   useEffect(() => {
+    const cached = sessionStorage.getItem(SCHOOL_CACHE_KEY);
+
+    if (cached) {
+      setSchools(JSON.parse(cached));
+      setLoadingSchools(false);
+      return;
+    }
+
     fetchDrivingSchools()
-      .then(setSchools)
+      .then((data) => {
+        setSchools(data);
+        sessionStorage.setItem(SCHOOL_CACHE_KEY, JSON.stringify(data));
+      })
       .finally(() => setLoadingSchools(false));
   }, []);
 
@@ -79,6 +95,9 @@ export default function DrivingLicenseForm() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  /* =========================
+     SUBMIT
+  ========================= */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -87,13 +106,11 @@ export default function DrivingLicenseForm() {
       return;
     }
 
-    // Validate required fields
     if (!formData.name || !formData.fatherHusbandName || !formData.dateOfBirth) {
       alert("Please fill all required fields");
       return;
     }
 
-    // Validate documents
     if (!formData.signatureUrl || !formData.photoUrl || !formData.aadharUrl) {
       alert("Please upload Signature, Photo, and Aadhar documents");
       return;
@@ -111,16 +128,16 @@ export default function DrivingLicenseForm() {
 
     try {
       setLoading(true);
+
       await submitApplication({
         ...formData,
-        class: formData.class as "M/C" | "LMV" | "M/C,LMV",
+        class: formData.class as LicenseClass,
         gender: formData.gender as "Male" | "Female" | "Other",
         age: Number(formData.age),
       });
 
       alert("Application submitted successfully");
 
-      // Reset form
       setFormData({
         institutionCode: "",
         name: "",
@@ -156,15 +173,20 @@ export default function DrivingLicenseForm() {
         licenseFileType: "",
         aadharFileType: "",
       });
-
-      setLoading(false);
     } catch (err) {
       console.error(err);
-      alert("Submission failed: " + (err instanceof Error ? err.message : "Unknown error"));
+      alert(
+        "Submission failed: " +
+          (err instanceof Error ? err.message : "Unknown error")
+      );
+    } finally {
       setLoading(false);
     }
   };
 
+  /* =========================
+     UI
+  ========================= */
   return (
     <div className="max-w-5xl mx-auto p-6">
       <Card>
@@ -179,25 +201,27 @@ export default function DrivingLicenseForm() {
             {/* DRIVING SCHOOL */}
             <div>
               <Label>Driving School *</Label>
-              <select
-                value={formData.institutionCode}
-                onChange={(e) =>
-                  handleInputChange("institutionCode", e.target.value)
-                }
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                required
-              >
-                <option value="" disabled>
-                  {loadingSchools
-                    ? "Loading driving schools..."
-                    : "Select driving school"}
-                </option>
-                {schools.map((s) => (
-                  <option key={s.code} value={s.code}>
-                    {s.name} – {s.place}
+              {loadingSchools ? (
+                <div className="h-10 w-full rounded-md border bg-muted animate-pulse" />
+              ) : (
+                <select
+                  value={formData.institutionCode}
+                  onChange={(e) =>
+                    handleInputChange("institutionCode", e.target.value)
+                  }
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  required
+                >
+                  <option value="" disabled>
+                    Select driving school
                   </option>
-                ))}
-              </select>
+                  {schools.map((s) => (
+                    <option key={s.code} value={s.code}>
+                      {s.name} – {s.place}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
 
             {/* PERSONAL INFO */}
@@ -238,7 +262,6 @@ export default function DrivingLicenseForm() {
                 <Label>Age</Label>
                 <Input
                   type="number"
-                  placeholder="Age"
                   value={formData.age}
                   onChange={(e) => handleInputChange("age", e.target.value)}
                 />
@@ -246,7 +269,6 @@ export default function DrivingLicenseForm() {
               <div>
                 <Label>Place of Birth</Label>
                 <Input
-                  placeholder="Place of Birth"
                   value={formData.placeOfBirth}
                   onChange={(e) =>
                     handleInputChange("placeOfBirth", e.target.value)
@@ -326,7 +348,6 @@ export default function DrivingLicenseForm() {
               <div>
                 <Label>Mobile *</Label>
                 <Input
-                  placeholder="Mobile"
                   value={formData.applicantMobile}
                   onChange={(e) =>
                     handleInputChange("applicantMobile", e.target.value)
@@ -337,7 +358,6 @@ export default function DrivingLicenseForm() {
               <div>
                 <Label>Emergency Mobile</Label>
                 <Input
-                  placeholder="Emergency Mobile"
                   value={formData.emergencyMobile}
                   onChange={(e) =>
                     handleInputChange("emergencyMobile", e.target.value)
@@ -350,7 +370,6 @@ export default function DrivingLicenseForm() {
               <div>
                 <Label>Aadhar Number *</Label>
                 <Input
-                  placeholder="Aadhar Number"
                   value={formData.aadharNo}
                   onChange={(e) => handleInputChange("aadharNo", e.target.value)}
                   required
@@ -360,7 +379,6 @@ export default function DrivingLicenseForm() {
                 <Label>Email</Label>
                 <Input
                   type="email"
-                  placeholder="Email"
                   value={formData.emailId}
                   onChange={(e) => handleInputChange("emailId", e.target.value)}
                 />
@@ -371,43 +389,20 @@ export default function DrivingLicenseForm() {
             <div>
               <h3 className="text-lg font-medium mb-4">Address</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input
-                  placeholder="House/Building"
-                  value={formData.house}
-                  onChange={(e) => handleInputChange("house", e.target.value)}
-                />
-                <Input
-                  placeholder="Place"
-                  value={formData.place}
-                  onChange={(e) => handleInputChange("place", e.target.value)}
-                />
-                <Input
-                  placeholder="Village"
-                  value={formData.village}
-                  onChange={(e) => handleInputChange("village", e.target.value)}
-                />
-                <Input
-                  placeholder="Taluk"
-                  value={formData.taluk}
-                  onChange={(e) => handleInputChange("taluk", e.target.value)}
-                />
-                <Input
-                  placeholder="Post Office"
-                  value={formData.postOffice}
-                  onChange={(e) =>
-                    handleInputChange("postOffice", e.target.value)
-                  }
-                />
-                <Input
-                  placeholder="PIN Code"
-                  value={formData.pinCode}
-                  onChange={(e) => handleInputChange("pinCode", e.target.value)}
-                />
-                <Input
-                  placeholder="District"
-                  value={formData.district}
-                  onChange={(e) => handleInputChange("district", e.target.value)}
-                />
+                <Input placeholder="House" value={formData.house}
+                  onChange={(e) => handleInputChange("house", e.target.value)} />
+                <Input placeholder="Place" value={formData.place}
+                  onChange={(e) => handleInputChange("place", e.target.value)} />
+                <Input placeholder="Village" value={formData.village}
+                  onChange={(e) => handleInputChange("village", e.target.value)} />
+                <Input placeholder="Taluk" value={formData.taluk}
+                  onChange={(e) => handleInputChange("taluk", e.target.value)} />
+                <Input placeholder="Post Office" value={formData.postOffice}
+                  onChange={(e) => handleInputChange("postOffice", e.target.value)} />
+                <Input placeholder="PIN Code" value={formData.pinCode}
+                  onChange={(e) => handleInputChange("pinCode", e.target.value)} />
+                <Input placeholder="District" value={formData.district}
+                  onChange={(e) => handleInputChange("district", e.target.value)} />
               </div>
             </div>
 
@@ -446,17 +441,25 @@ export default function DrivingLicenseForm() {
                   handleInputChange("licenseUrl", v);
                   handleInputChange("licenseFileType", mimeType);
                 }}
-                onLicenseBackUpload={(v) => handleInputChange("licenseBackUrl", v)}
+                onLicenseBackUpload={(v) =>
+                  handleInputChange("licenseBackUrl", v)
+                }
                 onAadharUpload={(v, mimeType) => {
                   handleInputChange("aadharUrl", v);
                   handleInputChange("aadharFileType", mimeType);
                 }}
-                onAadharBackUpload={(v) => handleInputChange("aadharBackUrl", v)}
+                onAadharBackUpload={(v) =>
+                  handleInputChange("aadharBackUrl", v)
+                }
               />
             </div>
 
             <div className="flex justify-center pt-6">
-              <Button disabled={loading} type="submit" size="lg">
+              <Button
+                disabled={loading || loadingSchools}
+                type="submit"
+                size="lg"
+              >
                 {loading ? "Submitting..." : "Submit Application"}
               </Button>
             </div>
