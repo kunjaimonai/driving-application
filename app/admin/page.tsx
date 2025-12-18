@@ -5,10 +5,18 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
+interface School {
+  code: string
+  name: string
+  email: string
+  driveFolderId: string
+  place: string
+}
+
 export default function AdminDrivingSchools() {
   const [password, setPassword] = useState("")
   const [auth, setAuth] = useState(false)
-  const [schools, setSchools] = useState([])
+  const [schools, setSchools] = useState<School[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
@@ -31,7 +39,7 @@ export default function AdminDrivingSchools() {
     try {
       setError("")
       setSuccess("")
-      
+
       const res = await fetch("/api?action=addSchool", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -65,7 +73,7 @@ export default function AdminDrivingSchools() {
 
       // fetchDrivingSchools().then(setSchools)
     } catch (err) {
-      setError(err.message || "Failed to add school")
+      setError((err as Error).message || "Failed to add school")
     }
   }
 
@@ -82,7 +90,7 @@ export default function AdminDrivingSchools() {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Access</h1>
             <p className="text-gray-600">Enter your password to continue</p>
           </div>
-          
+
           <div className="space-y-4">
             <Input
               type="password"
@@ -196,7 +204,7 @@ export default function AdminDrivingSchools() {
             </div>
           </div>
 
-          <Button 
+          <Button
             onClick={addSchool}
             className="w-full h-12 text-lg bg-indigo-600 hover:bg-indigo-700"
           >
