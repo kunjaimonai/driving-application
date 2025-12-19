@@ -15,7 +15,7 @@ export interface DrivingLicenseApplication {
   age: number;
   placeOfBirth: string;
   qualification: string;
-  class: "M/C" | "LMV" | "M/C,LMV";
+  class: "M/C" | "LMV" | "M/C,LMV" | "Heavy";
   bloodGroup: string;
   gender: "Male" | "Female" | "Other";
   applicantMobile: string;

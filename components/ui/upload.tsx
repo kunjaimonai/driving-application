@@ -101,6 +101,7 @@ export function FileUpload({
           sizeLabel: "Max 500KB • PDF, JPG, PNG",
           dimensions: "h-40",
         };
+      case "license":
         return {
           icon: FileText,
           label: `Driving License${sideLabel}`,
