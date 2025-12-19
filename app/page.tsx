@@ -25,10 +25,10 @@ const SCHOOL_CACHE_KEY = "driving_schools_cache";
 
 function FormContent() {
   const searchParams = useSearchParams();
-  
+
   // Sanitize URL ID
   const rawId = searchParams.get("schoolid");
-  const schoolIdFromUrl = rawId ? rawId.replace(/['"]+/g, '').trim() : "";
+  const schoolIdFromUrl = rawId ? rawId.replace(/['"]+/g, "").trim() : "";
 
   const [loading, setLoading] = useState(false);
   const [schools, setSchools] = useState<DrivingSchool[]>([]);
@@ -100,9 +100,14 @@ function FormContent() {
   ========================= */
   useEffect(() => {
     if (schools.length > 0 && schoolIdFromUrl) {
-      const foundSchool = schools.find((s) => s.code.toString() === schoolIdFromUrl);
+      const foundSchool = schools.find(
+        (s) => s.code.toString() === schoolIdFromUrl
+      );
       if (foundSchool) {
-        setFormData(prev => ({ ...prev, institutionCode: foundSchool.code.toString() }));
+        setFormData((prev) => ({
+          ...prev,
+          institutionCode: foundSchool.code.toString(),
+        }));
         setSelectedSchoolName(foundSchool.name);
         setSelectedSchoolPlace(foundSchool.place);
       }
@@ -118,7 +123,10 @@ function FormContent() {
       const today = new Date();
       let calculatedAge = today.getFullYear() - birthDate.getFullYear();
       const monthDiff = today.getMonth() - birthDate.getMonth();
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      if (
+        monthDiff < 0 ||
+        (monthDiff === 0 && today.getDate() < birthDate.getDate())
+      ) {
         calculatedAge--;
       }
       setFormData((prev) => ({ ...prev, age: calculatedAge.toString() }));
@@ -140,9 +148,12 @@ function FormContent() {
         age: Number(formData.age),
       });
       alert("Application submitted successfully");
-      window.location.reload(); 
+      window.location.reload();
     } catch (err) {
-      alert("Submission failed: " + (err instanceof Error ? err.message : "Unknown error"));
+      alert(
+        "Submission failed: " +
+          (err instanceof Error ? err.message : "Unknown error")
+      );
     } finally {
       setLoading(false);
     }
@@ -155,8 +166,9 @@ function FormContent() {
         <div className="text-center mb-4">
           <h1 className="text-2xl font-black text-primary tracking-tight">
             {selectedSchoolName.toUpperCase()}
+          </h1>
+          <h1 className="text-2xl font-black text-primary tracking-tight">
             {selectedSchoolPlace.toUpperCase()}
-
           </h1>
         </div>
       )}
@@ -170,8 +182,11 @@ function FormContent() {
 
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            
-            <input type="hidden" name="institutionCode" value={formData.institutionCode} />
+            <input
+              type="hidden"
+              name="institutionCode"
+              value={formData.institutionCode}
+            />
 
             {/* 2. SCHOOL SELECTION (ONLY SHOWS IF NO URL PARAM) */}
             {!schoolIdFromUrl && (
@@ -182,13 +197,19 @@ function FormContent() {
                 ) : (
                   <select
                     value={formData.institutionCode}
-                    onChange={(e) => handleInputChange("institutionCode", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("institutionCode", e.target.value)
+                    }
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary"
                     required
                   >
-                    <option value="" disabled>-- Select School --</option>
+                    <option value="" disabled>
+                      -- Select School --
+                    </option>
                     {schools.map((s) => (
-                      <option key={s.code} value={s.code}>{s.name} ({s.place})</option>
+                      <option key={s.code} value={s.code}>
+                        {s.name} ({s.place})
+                      </option>
                     ))}
                   </select>
                 )}
@@ -199,38 +220,75 @@ function FormContent() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label>Name of Applicant *</Label>
-                <Input value={formData.name} onChange={(e) => handleInputChange("name", e.target.value)} required />
+                <Input
+                  value={formData.name}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
+                  required
+                />
               </div>
               <div>
                 <Label>Father / Husband Name *</Label>
-                <Input value={formData.fatherHusbandName} onChange={(e) => handleInputChange("fatherHusbandName", e.target.value)} required />
+                <Input
+                  value={formData.fatherHusbandName}
+                  onChange={(e) =>
+                    handleInputChange("fatherHusbandName", e.target.value)
+                  }
+                  required
+                />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <Label>Date of Birth *</Label>
-                <Input type="date" value={formData.dateOfBirth} onChange={(e) => handleInputChange("dateOfBirth", e.target.value)} required />
+                <Input
+                  type="date"
+                  value={formData.dateOfBirth}
+                  onChange={(e) =>
+                    handleInputChange("dateOfBirth", e.target.value)
+                  }
+                  required
+                />
               </div>
               <div>
                 <Label>Age</Label>
-                <Input type="number" value={formData.age} readOnly className="bg-gray-100 font-bold" />
+                <Input
+                  type="number"
+                  value={formData.age}
+                  readOnly
+                  className="bg-gray-100 font-bold"
+                />
               </div>
               <div>
                 <Label>Place of Birth</Label>
-                <Input value={formData.placeOfBirth} onChange={(e) => handleInputChange("placeOfBirth", e.target.value)} />
+                <Input
+                  value={formData.placeOfBirth}
+                  onChange={(e) =>
+                    handleInputChange("placeOfBirth", e.target.value)
+                  }
+                />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <Label>Qualification</Label>
-                <Input value={formData.qualification} onChange={(e) => handleInputChange("qualification", e.target.value)} />
+                <Input
+                  value={formData.qualification}
+                  onChange={(e) =>
+                    handleInputChange("qualification", e.target.value)
+                  }
+                />
               </div>
               <div>
                 <Label>Class *</Label>
-                <Select value={formData.class} onValueChange={(v) => handleInputChange("class", v)}>
-                  <SelectTrigger><SelectValue placeholder="Select Class" /></SelectTrigger>
+                <Select
+                  value={formData.class}
+                  onValueChange={(v) => handleInputChange("class", v)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Class" />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="M/C">M/C</SelectItem>
                     <SelectItem value="LMV">LMV</SelectItem>
@@ -240,11 +298,28 @@ function FormContent() {
               </div>
               <div>
                 <Label>Blood Group</Label>
-                <Select value={formData.bloodGroup} onValueChange={(v) => handleInputChange("bloodGroup", v)}>
-                  <SelectTrigger><SelectValue placeholder="Blood Group" /></SelectTrigger>
+                <Select
+                  value={formData.bloodGroup}
+                  onValueChange={(v) => handleInputChange("bloodGroup", v)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Blood Group" />
+                  </SelectTrigger>
                   <SelectContent>
-                    {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "Unknown"].map((b) => (
-                      <SelectItem key={b} value={b}>{b}</SelectItem>
+                    {[
+                      "A+",
+                      "A-",
+                      "B+",
+                      "B-",
+                      "AB+",
+                      "AB-",
+                      "O+",
+                      "O-",
+                      "Unknown",
+                    ].map((b) => (
+                      <SelectItem key={b} value={b}>
+                        {b}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -255,8 +330,13 @@ function FormContent() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <Label>Gender *</Label>
-                <Select value={formData.gender} onValueChange={(v) => handleInputChange("gender", v)}>
-                  <SelectTrigger><SelectValue placeholder="Gender" /></SelectTrigger>
+                <Select
+                  value={formData.gender}
+                  onValueChange={(v) => handleInputChange("gender", v)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Gender" />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Male">Male</SelectItem>
                     <SelectItem value="Female">Female</SelectItem>
@@ -266,71 +346,132 @@ function FormContent() {
               </div>
               <div>
                 <Label>Applicant Mobile *</Label>
-                <Input value={formData.applicantMobile} onChange={(e) => handleInputChange("applicantMobile", e.target.value)} required />
+                <Input
+                  value={formData.applicantMobile}
+                  onChange={(e) =>
+                    handleInputChange("applicantMobile", e.target.value)
+                  }
+                  required
+                />
               </div>
               <div>
                 <Label>Emergency Mobile</Label>
-                <Input value={formData.emergencyMobile} onChange={(e) => handleInputChange("emergencyMobile", e.target.value)} />
+                <Input
+                  value={formData.emergencyMobile}
+                  onChange={(e) =>
+                    handleInputChange("emergencyMobile", e.target.value)
+                  }
+                />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label>Aadhar Number</Label>
-                <Input value={formData.aadharNo} onChange={(e) => handleInputChange("aadharNo", e.target.value)} />
+                <Input
+                  value={formData.aadharNo}
+                  onChange={(e) =>
+                    handleInputChange("aadharNo", e.target.value)
+                  }
+                />
               </div>
               <div>
                 <Label>Email ID</Label>
-                <Input type="email" value={formData.emailId} onChange={(e) => handleInputChange("emailId", e.target.value)} />
+                <Input
+                  type="email"
+                  value={formData.emailId}
+                  onChange={(e) => handleInputChange("emailId", e.target.value)}
+                />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label>Identification Mark 1</Label>
-                <Input value={formData.identificationMark1} onChange={(e) => handleInputChange("identificationMark1", e.target.value)} />
+                <Input
+                  value={formData.identificationMark1}
+                  onChange={(e) =>
+                    handleInputChange("identificationMark1", e.target.value)
+                  }
+                />
               </div>
               <div>
                 <Label>Identification Mark 2</Label>
-                <Input value={formData.identificationMark2} onChange={(e) => handleInputChange("identificationMark2", e.target.value)} />
+                <Input
+                  value={formData.identificationMark2}
+                  onChange={(e) =>
+                    handleInputChange("identificationMark2", e.target.value)
+                  }
+                />
               </div>
             </div>
 
             {/* ADDRESS SECTION */}
             <div className="space-y-4 pt-4 border-t">
-              <h3 className="text-lg font-semibold text-muted-foreground uppercase text-sm tracking-wider">Address Details</h3>
+              <h3 className="text-lg font-semibold text-muted-foreground uppercase text-sm tracking-wider">
+                Address Details
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label>House Name/No</Label>
-                  <Input value={formData.house} onChange={(e) => handleInputChange("house", e.target.value)} />
+                  <Input
+                    value={formData.house}
+                    onChange={(e) => handleInputChange("house", e.target.value)}
+                  />
                 </div>
                 <div>
                   <Label>Place</Label>
-                  <Input value={formData.place} onChange={(e) => handleInputChange("place", e.target.value)} />
+                  <Input
+                    value={formData.place}
+                    onChange={(e) => handleInputChange("place", e.target.value)}
+                  />
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <Label>Village</Label>
-                  <Input value={formData.village} onChange={(e) => handleInputChange("village", e.target.value)} />
+                  <Input
+                    value={formData.village}
+                    onChange={(e) =>
+                      handleInputChange("village", e.target.value)
+                    }
+                  />
                 </div>
                 <div>
                   <Label>Taluk</Label>
-                  <Input value={formData.taluk} onChange={(e) => handleInputChange("taluk", e.target.value)} />
+                  <Input
+                    value={formData.taluk}
+                    onChange={(e) => handleInputChange("taluk", e.target.value)}
+                  />
                 </div>
                 <div>
                   <Label>Post Office</Label>
-                  <Input value={formData.postOffice} onChange={(e) => handleInputChange("postOffice", e.target.value)} />
+                  <Input
+                    value={formData.postOffice}
+                    onChange={(e) =>
+                      handleInputChange("postOffice", e.target.value)
+                    }
+                  />
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label>PIN Code</Label>
-                  <Input value={formData.pinCode} onChange={(e) => handleInputChange("pinCode", e.target.value)} />
+                  <Input
+                    value={formData.pinCode}
+                    onChange={(e) =>
+                      handleInputChange("pinCode", e.target.value)
+                    }
+                  />
                 </div>
                 <div>
                   <Label>District</Label>
-                  <Input value={formData.district} onChange={(e) => handleInputChange("district", e.target.value)} />
+                  <Input
+                    value={formData.district}
+                    onChange={(e) =>
+                      handleInputChange("district", e.target.value)
+                    }
+                  />
                 </div>
               </div>
             </div>
@@ -342,10 +483,14 @@ function FormContent() {
                 <input
                   type="checkbox"
                   checked={formData.hasLicense}
-                  onChange={(e) => handleInputChange("hasLicense", e.target.checked)}
+                  onChange={(e) =>
+                    handleInputChange("hasLicense", e.target.checked)
+                  }
                   className="w-4 h-4 rounded border-gray-300"
                 />
-                <span className="text-sm font-medium">I already have a driving license (Renewal/Addition)</span>
+                <span className="text-sm font-medium">
+                  I already have a driving license (Renewal/Addition)
+                </span>
               </div>
 
               <DocumentUpload
@@ -372,9 +517,13 @@ function FormContent() {
               />
             </div>
 
-            <Button 
-              disabled={loading || loadingSchools || (formData.age !== "" && Number(formData.age) < 18)} 
-              type="submit" 
+            <Button
+              disabled={
+                loading ||
+                loadingSchools ||
+                (formData.age !== "" && Number(formData.age) < 18)
+              }
+              type="submit"
               className="w-full text-lg h-14 font-bold shadow-lg"
             >
               {loading ? "Submitting Application..." : "Submit Application"}
@@ -388,7 +537,13 @@ function FormContent() {
 
 export default function DrivingLicenseForm() {
   return (
-    <Suspense fallback={<div className="p-10 text-center animate-pulse">Initializing Form...</div>}>
+    <Suspense
+      fallback={
+        <div className="p-10 text-center animate-pulse">
+          Initializing Form...
+        </div>
+      }
+    >
       <FormContent />
     </Suspense>
   );
